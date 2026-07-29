@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.8.0";
+const APP_VERSION = "3.8.1";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -947,6 +947,7 @@ function clearSelectedRecords() {
 }
 
 function enterSelectionMode(id = "") {
+  clearNativeTextSelection();
   selectionMode = true;
   closeOtherSwipeCards(null);
   if (id) selectedRecordIds.add(id);
@@ -955,6 +956,7 @@ function enterSelectionMode(id = "") {
 }
 
 function toggleSelectionMode() {
+  clearNativeTextSelection();
   if (selectionMode || selectedRecordIds.size) clearSelectedRecords();
   else {
     selectionMode = true;
@@ -965,6 +967,7 @@ function toggleSelectionMode() {
 }
 
 function toggleRecordSelection(id) {
+  clearNativeTextSelection();
   if (!id) return;
   closeOtherSwipeCards(null);
   selectionMode = true;
@@ -1220,6 +1223,23 @@ function hapticTick(ms = 8) {
   if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} }
 }
 
+function clearNativeTextSelection() {
+  const active = document.activeElement;
+  if (active && ["INPUT", "TEXTAREA"].includes(active.tagName)) return;
+  try {
+    const selection = window.getSelection?.();
+    if (selection && selection.rangeCount) selection.removeAllRanges();
+  } catch (e) {}
+}
+
+function preventRecordNativeSelection(target, event) {
+  const element = target?.closest?.(".record-card, .nav-item, .quick-card, .chip, .history-filter-btn");
+  if (!element) return;
+  if (target.closest?.("input, textarea, select")) return;
+  if (event?.cancelable) event.preventDefault();
+  clearNativeTextSelection();
+}
+
 function closeOtherSwipeCards(exceptCard) {
   document.querySelectorAll(".record-card").forEach(card => {
     if (card !== exceptCard && card._closeSwipe) card._closeSwipe({ immediate: false });
@@ -1297,6 +1317,10 @@ function setupSwipeableRecordCard(card) {
   card._closeSwipe = close;
   card._openSwipe = open;
 
+  body.addEventListener("contextmenu", event => preventRecordNativeSelection(event.target, event));
+  body.addEventListener("selectstart", event => preventRecordNativeSelection(event.target, event));
+  body.addEventListener("dragstart", event => preventRecordNativeSelection(event.target, event));
+
   let longPressTimer = 0;
   let longPressFired = false;
 
@@ -1324,6 +1348,7 @@ function setupSwipeableRecordCard(card) {
       longPressFired = true;
       dragging = false;
       axis = null;
+      clearNativeTextSelection();
       close({ immediate: true });
       if (recordId) enterSelectionMode(recordId);
     }, 520);
@@ -2298,6 +2323,16 @@ async function switchLanguageSmooth() {
 }
 
 function initEvents() {
+  document.addEventListener("selectionchange", () => {
+    const selection = window.getSelection?.();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) return;
+    const node = selection.anchorNode;
+    const element = node?.nodeType === 1 ? node : node?.parentElement;
+    if (element?.closest?.(".record-card, .nav-item, .quick-card, .chip, .history-filter-btn")) {
+      clearNativeTextSelection();
+    }
+  });
+
   document.addEventListener("pointerdown", event => {
     const card = event.target.closest(".record-card");
     if (activeSwipeCard && card !== activeSwipeCard) closeOtherSwipeCards(null);

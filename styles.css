@@ -1299,7 +1299,7 @@ html[data-template=pearl] .theme-signature{
 }
 
 /* ---------------------------------------------------------------------------
-   23. v3.8.0 — refinement pack: intentional selection, quick add, iPhone polish
+   23. v3.8.1 — refinement pack: intentional selection, quick add, iPhone polish
 --------------------------------------------------------------------------- */
 .history-head-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto}
 .history-head-actions .ghost-button{min-height:44px;padding:9px 13px}
@@ -1353,3 +1353,76 @@ body.history-selection-active .record-card:not(.record-selected){opacity:.96}
 }
 #quickAddTypeOut:checked+label{background:var(--danger);color:#fff}
 #quickAddTypeIn:checked+label{background:var(--positive);color:#fff}
+
+
+/* ---------------------------------------------------------------------------
+   24. v3.8.1 — iPhone long-press + light-mode card paint fix
+   Keep selection intentional: long-press should enter selection mode, not trigger
+   iOS text selection. Also avoid Safari light-mode paint/content-visibility cuts
+   around selected history cards.
+--------------------------------------------------------------------------- */
+.record-card,
+.record-card *,
+.nav-item,
+.nav-item *,
+.quick-card,
+.quick-card *,
+.chip,
+.history-filter-btn{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+.record-card button,
+.nav-item,
+.quick-card,
+.chip,
+.history-filter-btn{
+  touch-action:manipulation;
+}
+.record-card{
+  contain:layout style!important;
+  background:transparent!important;
+  overflow:hidden;
+}
+.record-list{
+  content-visibility:visible!important;
+  contain-intrinsic-size:auto!important;
+}
+.record-card-body{
+  overflow:hidden;
+  clip-path:inset(0 round 22px);
+  background:
+    linear-gradient(155deg, var(--surface-2), var(--surface)),
+    var(--bg)!important;
+}
+html[data-theme=light] .record-card-body{
+  background:
+    linear-gradient(155deg, rgba(255,255,255,.92), rgba(255,255,255,.80)),
+    var(--bg)!important;
+}
+html[data-theme=light] .record-card.record-selected .record-card-body{
+  background:
+    linear-gradient(155deg, rgba(255,255,255,.96), rgba(255,255,255,.86)),
+    var(--bg)!important;
+}
+.record-card.record-selected{
+  box-shadow:none;
+}
+.record-card.record-selected .record-card-body{
+  box-shadow:0 12px 28px rgba(0,0,0,.10), inset 0 0 0 1px var(--line-strong);
+}
+.record-card.selection-mode .record-card-body,
+.record-card.record-selected .record-card-body{
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
+@media (hover:none) and (pointer:coarse), (max-width:520px){
+  .record-card-body{
+    clip-path:none;
+    border-radius:22px;
+  }
+  .record-card.record-selected .record-card-body{
+    box-shadow:0 10px 22px rgba(0,0,0,.08), inset 0 0 0 1px var(--line-strong);
+  }
+}

@@ -1,8 +1,8 @@
-# DollarTracker v3.8.0 Refinement Pack
+# DollarTracker v3.8.1 Refinement Pack
 
 Focus: iPhone smoothness, clearer History selection, Quick Add, and safer backup import without crowding the UI.
 
-## v3.8.0 changes
+## v3.8.1 changes
 
 - History selection is now intentional: tap **Select** or long-press a record to enter selection mode.
 - Selection circles stay hidden during normal browsing so History looks calmer.
@@ -382,3 +382,18 @@ No storage schema change. No money logic changes beyond preserving historical KH
 - Locked mobile signature sizing to intrinsic SVG aspect ratios instead of stretched background sizing.
 - Kept money logic, storage, History selection, swipe behavior, backup, and calculator logic untouched.
 - Bumped app/script/style version and service-worker cache for a clean PWA refresh.
+
+
+## v3.8.1 iPhone Selection Paint Fix
+
+- Fixed iOS long-press on History records triggering native text selection/copy handles.
+- Long-press now stays focused on entering selection mode only.
+- Disabled native selection/callout on record cards, nav items, quick cards, chips, and history filter buttons while keeping inputs editable.
+- Removed the iOS Safari light-mode paint/content-visibility clipping that could show a square background slab around selected History cards.
+- Kept the v3.8.0 UI/feature set unchanged; this is a bugfix and polish patch only.
+
+## Next update watchlist
+
+- Continue testing History selection on real iPhone PWA mode.
+- Tune Quick Add only if it feels useful without crowding the Add flow.
+- Keep recurring transactions separate for a future build with a clean management UI.
