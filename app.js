@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.7.4";
+const APP_VERSION = "3.7.5";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -1023,7 +1023,7 @@ function translateUI() {
   setText("totalInLabel", tr("totalIn")); setText("totalOutLabel", tr("totalOut")); setText("amountUsedLabel", tr("amountUsed"));
   setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance")); setText("monthlyBudgetsTitle", tr("monthlyBudgets")); setText("monthlyBudgetsHint", tr("monthlyBudgetsHint")); setText("categoryChartTitle", tr("categoryChart")); setText("categoryChartHint", tr("categoryChartHint"));
   setText("recentTitle", tr("recent")); setText("latestMovementText", tr("latestMovement")); setText("viewAllBtn", tr("viewAll"));
-  setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
+  setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("floatingSaveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
   $("#descriptionInput").placeholder = tr("whatForPlaceholder"); $("#noteInput").placeholder = tr("optionalNote");
   setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("openFilterText", tr("filter")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("historyFilterTitle", tr("filterRecords")); setText("historyFilterHint", tr("filterHint")); setText("closeHistoryFilterBtn", tr("close")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("sortByLabel", tr("sortBy")); setText("clearFiltersBtn", tr("clearFilters")); setText("applyHistoryFilterBtn", tr("applyFilters"));
   $("#searchInput").placeholder = tr("searchRecords");
@@ -1082,6 +1082,7 @@ function setPage(page, options = {}) {
   translateUI();
   saveState();
   if (options.render !== false) render();
+  updateFloatingSaveButton();
   window.requestAnimationFrame(updateNavPill);
   window.scrollTo({ top: 0, behavior: isReducedMotion() ? "auto" : "smooth" });
 }
@@ -1090,9 +1091,10 @@ function renderAmountChips() {
   const container = $("#amountChips");
   const info = currencyInfo(settings.displayCurrency);
   container.innerHTML = info.chips.map(value => `<button type="button" data-amount="${value}">${formatRawMoney(value, settings.displayCurrency)}</button>`).join("");
-  $$("[data-amount]").forEach(button => button.addEventListener("click", () => {
+  $$('[data-amount]').forEach(button => button.addEventListener('click', () => {
     $("#amountInput").value = button.dataset.amount;
     $("#amountInput").focus();
+    updateFloatingSaveButton();
     debouncedStateSave();
   }));
   const input = $("#amountInput");
@@ -1167,7 +1169,7 @@ function setupSwipeableRecordCard(card) {
   const actions = card.querySelector(".record-swipe-actions");
   if (!body || !actions) return;
 
-  const REVEAL = 132;
+  const REVEAL = 148;
   const OPEN_THRESHOLD = REVEAL * 0.38;
   let startX = 0;
   let startY = 0;
@@ -1199,12 +1201,18 @@ function setupSwipeableRecordCard(card) {
   }
 
   function open() {
+    if (card.classList.contains("record-selected")) {
+      close({ immediate: true });
+      return;
+    }
     closeOtherSwipeCards(card);
     setX(-REVEAL, true);
     if (!opened) hapticTick(10);
     opened = true;
     activeSwipeCard = card;
+    card.classList.remove("swipe-dragging");
     card.classList.add("swipe-open");
+    actions.setAttribute("aria-hidden", "false");
   }
 
   function close(options = {}) {
@@ -1219,7 +1227,8 @@ function setupSwipeableRecordCard(card) {
     opened = false;
     dragging = false;
     axis = null;
-    card.classList.remove("swipe-open");
+    card.classList.remove("swipe-open", "swipe-dragging");
+    actions.setAttribute("aria-hidden", "true");
     if (activeSwipeCard === card) activeSwipeCard = null;
   }
 
@@ -1228,6 +1237,7 @@ function setupSwipeableRecordCard(card) {
 
   body.addEventListener("pointerdown", event => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (card.classList.contains("record-selected")) return;
     if (event.target.closest("button, a, input, textarea, select")) return;
     dragging = true;
     axis = null;
@@ -1245,7 +1255,11 @@ function setupSwipeableRecordCard(card) {
     if (axis === null) {
       if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
       axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-      if (axis === "x") closeOtherSwipeCards(card);
+      if (axis === "x") {
+        closeOtherSwipeCards(card);
+        card.classList.add("swipe-dragging");
+        actions.setAttribute("aria-hidden", "false");
+      }
     }
     if (axis !== "x") return;
     event.preventDefault();
@@ -1255,7 +1269,10 @@ function setupSwipeableRecordCard(card) {
   function endDrag(event) {
     if (!dragging) return;
     dragging = false;
-    if (axis !== "x") return;
+    if (axis !== "x") {
+      card.classList.remove("swipe-dragging");
+      return;
+    }
 
     const dx = event ? event.clientX - startX : currentX - baseX;
     const elapsed = Math.max(1, performance.now() - startTime);
@@ -1301,6 +1318,21 @@ function renderSummary() {
 
 function activePageName() {
   return $(".page.active")?.id?.replace("page-", "") || "home";
+}
+
+function amountInputReady() {
+  const input = $("#amountInput");
+  if (!input) return false;
+  let value = Number(input.value || 0);
+  if (settings.displayCurrency === "KHR") value = Math.round(value);
+  return Number.isFinite(value) && value > 0;
+}
+
+function updateFloatingSaveButton() {
+  const ready = activePageName() === "add" && amountInputReady();
+  document.body.classList.toggle("floating-save-ready", ready);
+  const button = $("#floatingSaveRecordBtn");
+  if (button) button.setAttribute("aria-hidden", ready ? "false" : "true");
 }
 
 function isReducedMotion() {
@@ -1465,6 +1497,7 @@ function renderSharedPolish() {
   $$(".currency-card-btn").forEach(button => button.classList.toggle("active", button.dataset.currency === settings.displayCurrency));
   updateSegmentedPills();
   updateCurrencySwitchPill();
+  updateFloatingSaveButton();
   window.requestAnimationFrame(updateNavPill);
 }
 
@@ -1517,6 +1550,7 @@ function addRecord(event) {
   event.currentTarget.reset();
   $("#typeOut").checked = true;
   $("#dateInput").value = todayISO();
+  updateFloatingSaveButton();
   saveRecords();
   saveState();
   setPage("home", { render: false });
@@ -2021,6 +2055,7 @@ function restoreDraft() {
 
   if (!draft) {
     $("#dateInput").value = todayISO();
+    updateFloatingSaveButton();
     return;
   }
 
@@ -2031,6 +2066,7 @@ function restoreDraft() {
   renderCategoryOptions($("#categoryInput"), draft.category || "other");
   const typeInput = draft.type === "In" ? $("#typeIn") : $("#typeOut");
   if (typeInput) typeInput.checked = true;
+  updateFloatingSaveButton();
 }
 
 async function switchLanguageSmooth() {
@@ -2103,6 +2139,8 @@ function initEvents() {
 
     const selectButton = event.target.closest("[data-select-record]");
     if (selectButton) {
+      event.preventDefault();
+      event.stopPropagation();
       closeOtherSwipeCards(null);
       toggleRecordSelection(selectButton.dataset.selectRecord);
       return;
@@ -2169,9 +2207,13 @@ function initEvents() {
     if (!el) return;
 
     ["input", "change"].forEach(eventName => {
-      el.addEventListener(eventName, debouncedStateSave);
+      el.addEventListener(eventName, () => {
+        if (id === "amountInput") updateFloatingSaveButton();
+        debouncedStateSave();
+      });
     });
     el.addEventListener("blur", () => {
+      if (id === "amountInput") updateFloatingSaveButton();
       debouncedStateSave.flush?.();
       saveState();
     });
@@ -2179,6 +2221,7 @@ function initEvents() {
 
   $$('input[name="type"]').forEach(input => input.addEventListener("change", () => {
     updateSegmentedPills();
+    updateFloatingSaveButton();
     debouncedStateSave();
   }));
   $$('input[name="editType"]').forEach(input => input.addEventListener("change", updateSegmentedPills));

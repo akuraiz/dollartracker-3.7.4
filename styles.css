@@ -988,7 +988,7 @@ html[data-template=web][data-theme=light]{
 
 
 /* ---------------------------------------------------------------------------
-   20. v3.7.4 — smoother swipe reset + selected history total
+   20. v3.7.5 — smoother swipe reset + selected history total
 --------------------------------------------------------------------------- */
 .selectable-record-body{
   grid-template-columns:auto minmax(0,1fr) auto auto;
@@ -1105,4 +1105,155 @@ html[data-template=christmas] .theme-signature{
     bottom:calc(100px + var(--safe-bottom));
     width:min(286px,calc(100vw - 20px));
   }
+}
+
+/* ---------------------------------------------------------------------------
+   21. v3.7.5 — phone polish: bottom actions, cleaner swipe, crisper signatures
+--------------------------------------------------------------------------- */
+.floating-save-button{
+  position:fixed;
+  z-index:39;
+  left:50%;
+  bottom:calc(96px + var(--safe-bottom));
+  width:min(444px,calc(100vw - 36px));
+  min-height:58px;
+  border-radius:24px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translate3d(-50%,16px,0) scale(.985);
+  transition:opacity .22s ease,visibility .22s ease,transform .34s cubic-bezier(.22,1,.36,1),box-shadow .34s ease;
+  box-shadow:0 22px 50px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.20);
+}
+body.floating-save-ready .floating-save-button{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translate3d(-50%,0,0) scale(1);
+}
+body.floating-save-ready #saveRecordBtn{
+  visibility:hidden;
+}
+
+.selection-float{
+  position:fixed!important;
+  z-index:38;
+  left:50%;
+  right:auto!important;
+  bottom:calc(96px + var(--safe-bottom));
+  width:min(444px,calc(100vw - 28px));
+  padding:12px 14px;
+  border-radius:26px;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translate3d(-50%,0,0) scale(1);
+  transition:opacity .22s ease,visibility .22s ease,transform .34s cubic-bezier(.22,1,.36,1);
+  animation:none!important;
+}
+#selectionFloat.hidden{
+  display:grid!important;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translate3d(-50%,16px,0) scale(.985);
+}
+.selection-float-copy{min-width:0}
+.selection-float span,.selection-float small{
+  font-size:11px;
+  line-height:1.25;
+}
+.selection-float strong{
+  font-size:24px;
+  line-height:1.02;
+}
+.selection-float .ghost-button{
+  min-height:44px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.10);
+}
+
+.record-card{
+  isolation:isolate;
+  background:var(--bg);
+}
+.record-card-body{
+  z-index:2;
+  transition:border-radius .18s ease, box-shadow .22s ease, transform .34s cubic-bezier(.22,1,.36,1);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.record-swipe-actions{
+  z-index:1;
+  width:148px;
+  border-radius:0 22px 22px 0;
+  overflow:hidden;
+  opacity:0;
+  pointer-events:none;
+  transform:translate3d(8px,0,0);
+  transition:opacity .12s ease, transform .22s cubic-bezier(.22,1,.36,1);
+  will-change:opacity,transform;
+}
+.record-card.swipe-open .record-swipe-actions,
+.record-card.swipe-dragging .record-swipe-actions{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate3d(0,0,0);
+}
+.record-card.record-selected .record-swipe-actions{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.swipe-edit-btn,.swipe-delete-btn{
+  width:74px;
+  min-width:74px;
+  height:100%;
+  align-content:center;
+}
+.record-card.swipe-open .record-card-body,
+.record-card.swipe-dragging .record-card-body{
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+}
+.record-card:not(.swipe-open):not(.swipe-dragging) .record-card-body{
+  transform:translate3d(0,0,0)!important;
+}
+.record-select-btn{
+  position:relative;
+  z-index:3;
+}
+
+@media (hover:none) and (pointer:coarse), (max-width:520px){
+  .theme-signature{
+    image-rendering:auto;
+    transform:none!important;
+    background-size:100% 100%!important;
+    background-position:top right!important;
+    filter:none!important;
+    opacity:.98!important;
+  }
+  html[data-template=pink] .theme-signature{width:130px;height:100px;right:-2px;top:2px}
+  html[data-template=christmas] .theme-signature{width:142px;height:112px;right:-4px;top:-3px}
+  html[data-template=web] .theme-signature{width:128px;height:110px;right:-3px;top:-1px}
+  html[data-template=symbiote] .theme-signature{width:120px;height:98px;right:-1px;top:6px}
+  html[data-template=blush] .theme-signature{width:104px;height:92px;right:2px;top:8px}
+  html[data-template=ocean] .theme-signature{width:114px;height:94px;right:1px;top:7px}
+  html[data-template=pearl] .theme-signature{width:106px;height:92px;right:2px;top:7px}
+}
+
+@media (max-width:370px){
+  .floating-save-button{
+    bottom:calc(94px + var(--safe-bottom));
+    width:min(428px,calc(100vw - 24px));
+  }
+  .selection-float{
+    left:50%;
+    bottom:calc(94px + var(--safe-bottom));
+    width:min(428px,calc(100vw - 20px));
+  }
+  .selection-float strong{font-size:22px}
 }

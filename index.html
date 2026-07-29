@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800;900&family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.7.4" />
+  <link rel="stylesheet" href="styles.css?v=3.7.5" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -203,14 +203,6 @@
           </div>
 
           <div class="record-list" id="historyList"></div>
-          <div class="selection-float glass-strong hidden" id="selectionFloat" aria-live="polite">
-            <div class="selection-float-copy">
-              <span id="selectionCount">0 selected</span>
-              <small id="selectionTotalLabel">Selected total</small>
-              <strong id="selectionTotal">$0.00</strong>
-            </div>
-            <button class="ghost-button compact-button" type="button" id="clearSelectionBtn">Clear</button>
-          </div>
         </section>
       </section>
 
@@ -329,6 +321,17 @@
         </section>
       </section>
     </main>
+
+    <button class="primary-button floating-save-button" type="submit" form="transactionForm" id="floatingSaveRecordBtn" aria-hidden="true">Save Record</button>
+
+    <div class="selection-float glass-strong hidden" id="selectionFloat" aria-live="polite">
+      <div class="selection-float-copy">
+        <span id="selectionCount">0 selected</span>
+        <small id="selectionTotalLabel">Selected total</small>
+        <strong id="selectionTotal">$0.00</strong>
+      </div>
+      <button class="ghost-button compact-button" type="button" id="clearSelectionBtn">Clear</button>
+    </div>
 
     <nav class="bottom-nav glass" aria-label="Main navigation"><span class="nav-active-pill" aria-hidden="true"></span>
       <button class="nav-item active" type="button" data-page="home"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span class="nav-label" id="navHome">Home</span></button>
@@ -503,6 +506,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.7.4"></script>
+  <script src="app.js?v=3.7.5"></script>
 </body>
 </html>

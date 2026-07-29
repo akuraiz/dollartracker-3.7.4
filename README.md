@@ -326,7 +326,7 @@ Theme polish patch:
 - Made the swipe-actions panel width explicit (132px) instead of relying on flex shrink-to-fit sizing.
 - No money logic, storage, categories, budgets, backup, or calculator logic touched.
 
-## v3.7.4 Stability + Selection Patch
+## v3.7.5 Stability + Selection Patch
 
 Focused stability patch built from v3.7.3.
 
@@ -344,3 +344,13 @@ Focused stability patch built from v3.7.3.
 - Added small accessibility labels for History search, category creation, and modal dialogs.
 
 No storage schema change. No money logic changes beyond preserving historical KHR rates correctly during non-money edits.
+
+## v3.7.5 Phone Interaction Polish
+
+- Added a floating Save Record button that appears once a valid amount is entered on the Add page, so saving does not require scrolling to the bottom of the form.
+- Moved the selected-record total out of the History glass panel and into a real fixed bottom control above the navigation bar, avoiding Safari fixed-position issues caused by backdrop-filter parents.
+- Hid swipe actions until an actual horizontal swipe or more-button open state, preventing Edit/Delete color bleed and the flash when selecting records.
+- Made the swipe action tray wider, fully clipped to the card edge, and removed the content card's right rounding while open so Edit/Delete feels more like a connected iOS action reveal.
+- Disabled swipe dragging while a record is selected, keeping selection mode calm and preventing accidental Edit/Delete reveals.
+- Removed small-screen signature SVG scaling/drop-shadow filters so balance-card theme artwork renders sharper on iPhone.
+- Bumped app/script/style version and service-worker cache for cleaner PWA refresh.
