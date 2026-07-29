@@ -1,7 +1,7 @@
 
 "use strict";
 
-const APP_VERSION = "3.7.6";
+const APP_VERSION = "3.8.0";
 const RECORD_KEY = "dollarTracker.records.v3";
 const SETTINGS_KEY = "dollarTracker.settings.v3";
 const STATE_KEY = "dollarTracker.state.v3";
@@ -39,7 +39,8 @@ const defaultSettings = {
   lastBackupAt: "",
   backupReminderDismissedAt: "",
   categories: [],
-  categoryBudgets: {}
+  categoryBudgets: {},
+  lastBackupRecordCount: 0
 };
 
 const currencyPresets = {
@@ -76,7 +77,7 @@ const I18N = {
     addedFallback:"Amount added", usedFallback:"Amount used", changedToEnglish:"Changed to English", changedToKhmer:"Changed to Khmer",
     edit:"Edit", editRecord:"Edit Record",
     editHint:"History amounts stay locked unless you edit this record.", currency:"Currency", saveChanges:"Save Changes", recordUpdated:"Record updated", category:"Category", thisMonth:"This Month", monthlyHint:"Quick monthly view", balance:"Balance", topCategory:"Top category: {category}", none:"None",
-    monthlyBudgets:"Monthly Budgets", monthlyBudgetsHint:"Track spending caps for this month.", categoryChart:"Category Breakdown", categoryChartHint:"This month’s spending by category.", noCategorySpending:"No category spending this month.", categoryManager:"Manage Categories", categoryManagerHint:"Add, rename, remove, or reset categories.", newCategoryPlaceholder:"New category name", addCategory:"Add", save:"Save", remove:"Remove", resetCategories:"Reset to Default", categoryExists:"Category already exists", categoryAdded:"Category added", categoryRenamed:"Category renamed", categoryRemoved:"Category removed", categoriesReset:"Categories reset", cannotRemoveOther:"Other cannot be removed", removeCategoryConfirm:"Remove this category? Existing records will move to Other.", resetCategoriesConfirm:"Reset categories to default? Custom categories will move to Other.", categoryBudgets:"Category Budgets", categoryBudgetsHint:"Monthly caps per category. Stored internally in USD.", budgetCurrencyNote:"Shown in current display currency.", saveBudgets:"Save Budgets", budgetsSaved:"Budgets saved", noBudgetsSet:"No budgets set yet. Add caps in Settings.", budgetSpentLine:"{spent} of {budget}", budgetInputHint:"Leave 0 for no cap.", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport", showMore:"Show more", showingRecords:"Showing {shown} of {total}", editHistory:"Edit History", noEdits:"No edits yet.", editedOn:"Edited {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"Type", fieldAmount:"Amount", fieldCategory:"Category", fieldDescription:"Description", fieldDate:"Date", fieldNote:"Note", selectedRecords:"{count} selected", selectedTotal:"Selected total", clearSelection:"Clear", selectRecord:"Select record", newVersionAvailable:"New version available. Reopen app."
+    monthlyBudgets:"Monthly Budgets", monthlyBudgetsHint:"Track spending caps for this month.", categoryChart:"Category Breakdown", categoryChartHint:"This month’s spending by category.", noCategorySpending:"No category spending this month.", categoryManager:"Manage Categories", categoryManagerHint:"Add, rename, remove, or reset categories.", newCategoryPlaceholder:"New category name", addCategory:"Add", save:"Save", remove:"Remove", resetCategories:"Reset to Default", categoryExists:"Category already exists", categoryAdded:"Category added", categoryRenamed:"Category renamed", categoryRemoved:"Category removed", categoriesReset:"Categories reset", cannotRemoveOther:"Other cannot be removed", removeCategoryConfirm:"Remove this category? Existing records will move to Other.", resetCategoriesConfirm:"Reset categories to default? Custom categories will move to Other.", categoryBudgets:"Category Budgets", categoryBudgetsHint:"Monthly caps per category. Stored internally in USD.", budgetCurrencyNote:"Shown in current display currency.", saveBudgets:"Save Budgets", budgetsSaved:"Budgets saved", noBudgetsSet:"No budgets set yet. Add caps in Settings.", budgetSpentLine:"{spent} of {budget}", budgetInputHint:"Leave 0 for no cap.", quickAC:"AC", quickAC:"AC", quickFood:"Food", quickCoffee:"Coffee", quickTransfer:"Transfer", quickShopping:"Shopping", catFood:"Food", catTransfer:"Transfer", catShopping:"Shopping", catTransport:"Transport", catSavings:"Savings", catOther:"Other", calculator:"Calculator", calculatorHint:"Calculate and use as amount.", useAmount:"Use Amount", khrWholeOnly:"KHR uses whole Riel only", quickTransport:"Transport", showMore:"Show more", showingRecords:"Showing {shown} of {total}", editHistory:"Edit History", noEdits:"No edits yet.", editedOn:"Edited {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"Type", fieldAmount:"Amount", fieldCategory:"Category", fieldDescription:"Description", fieldDate:"Date", fieldNote:"Note", selectedRecords:"{count} selected", selectedTotal:"Selected total", clearSelection:"Clear", selectRecord:"Select record", selectHistory:"Select", doneSelection:"Done", selectAllVisible:"Select visible", quickAdd:"Quick Add", quickAddHint:"Fast entry with clean presets.", quickAddAmount:"Amount", saveQuickAdd:"Save Quick Add", openFullAdd:"Open full Add", importPreview:"Import backup?\n\nBackup records: {count}\nExported: {date}\nVersion: {version}\n\nThis will replace current records in this browser.", backupReminderNewRecordsText:"You added 10+ records since your last backup. Export one now so your records stay safe.", newVersionAvailable:"New version available. Reopen app."
   },
   km: {
     eyebrow:"បញ្ជីទឹកប្រាក់ឯកជន", home:"ទំព័រដើម", add:"បញ្ចូល", addRecord:"បញ្ចូលកំណត់ត្រា", history:"ប្រវត្តិ", backup:"បម្រុងទុក", settings:"ការកំណត់",
@@ -106,7 +107,7 @@ const I18N = {
     importConfirm:"នាំចូល Backup? វានឹងជំនួសកំណត់ត្រាបច្ចុប្បន្នក្នុង Browser នេះ។", importError:"មិនអាចនាំចូល Backup បានទេ។ សូមពិនិត្យថា វាជាឯកសារ JSON ត្រឹមត្រូវ។",
     addedFallback:"ទឹកប្រាក់បានបន្ថែម", usedFallback:"ទឹកប្រាក់បានប្រើ", changedToEnglish:"បានប្តូរទៅភាសាអង់គ្លេស", changedToKhmer:"បានប្តូរទៅភាសាខ្មែរ",
     edit:"កែ", editRecord:"កែប្រែកំណត់ត្រា",
-    editHint:"ចំនួនទឹកប្រាក់ក្នុងប្រវត្តិនឹងនៅដដែល លុះត្រាតែអ្នកកែប្រែកំណត់ត្រានេះ។", currency:"រូបិយប័ណ្ណ", saveChanges:"រក្សាទុកការកែប្រែ", recordUpdated:"បានកែប្រែកំណត់ត្រា", category:"ប្រភេទ", thisMonth:"ខែនេះ", monthlyHint:"សង្ខេបប្រចាំខែ", balance:"សមតុល្យ", topCategory:"ប្រភេទប្រើច្រើនបំផុត៖ {category}", monthlyBudgets:"ថវិកាប្រចាំខែ", monthlyBudgetsHint:"តាមដានកម្រិតចំណាយសម្រាប់ខែនេះ។", categoryChart:"បំបែកតាមប្រភេទ", categoryChartHint:"ចំណាយខែនេះតាមប្រភេទ។", noCategorySpending:"មិនទាន់មានចំណាយតាមប្រភេទសម្រាប់ខែនេះ។", categoryManager:"គ្រប់គ្រងប្រភេទ", categoryManagerHint:"បន្ថែម ប្តូរឈ្មោះ លុប ឬកំណត់ប្រភេទឡើងវិញ។", newCategoryPlaceholder:"ឈ្មោះប្រភេទថ្មី", addCategory:"បន្ថែម", save:"រក្សាទុក", remove:"លុប", resetCategories:"កំណត់លំនាំដើម", categoryExists:"ប្រភេទនេះមានរួចហើយ", categoryAdded:"បានបន្ថែមប្រភេទ", categoryRenamed:"បានប្តូរឈ្មោះប្រភេទ", categoryRemoved:"បានលុបប្រភេទ", categoriesReset:"បានកំណត់ប្រភេទឡើងវិញ", cannotRemoveOther:"មិនអាចលុប ផ្សេងៗ បានទេ", removeCategoryConfirm:"លុបប្រភេទនេះ? កំណត់ត្រាដែលមានស្រាប់នឹងផ្លាស់ទៅ ផ្សេងៗ។", resetCategoriesConfirm:"កំណត់ប្រភេទទៅលំនាំដើមវិញ? ប្រភេទផ្ទាល់ខ្លួននឹងផ្លាស់ទៅ ផ្សេងៗ។", categoryBudgets:"ថវិកាតាមប្រភេទ", categoryBudgetsHint:"កម្រិតប្រចាំខែតាមប្រភេទ។ រក្សាទុកជាប្រាក់ដុល្លារខាងក្នុង។", budgetCurrencyNote:"បង្ហាញជារូបិយប័ណ្ណបច្ចុប្បន្ន។", saveBudgets:"រក្សាទុកថវិកា", budgetsSaved:"បានរក្សាទុកថវិកា", noBudgetsSet:"មិនទាន់កំណត់ថវិកា។ បន្ថែមកម្រិតក្នុងការកំណត់។", budgetSpentLine:"{spent} នៃ {budget}", budgetInputHint:"ទុក 0 ប្រសិនបើគ្មានកម្រិត។", editHistory:"ប្រវត្តិកែប្រែ", noEdits:"មិនទាន់មានការកែប្រែ។", editedOn:"បានកែ {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"ប្រភេទ", fieldAmount:"ចំនួនទឹកប្រាក់", fieldCategory:"ប្រភេទ", fieldDescription:"ការពិពណ៌នា", fieldDate:"កាលបរិច្ឆេទ", fieldNote:"ចំណាំ", selectedRecords:"បានជ្រើស {count}", selectedTotal:"សរុបដែលបានជ្រើស", clearSelection:"លុបជម្រើស", selectRecord:"ជ្រើសកំណត់ត្រា", none:"គ្មាន", quickAC:"AC", quickAC:"AC", quickFood:"អាហារ", quickCoffee:"កាហ្វេ", quickTransfer:"ផ្ទេរ", quickShopping:"ទិញឥវ៉ាន់", catFood:"អាហារ", catTransfer:"ផ្ទេរ", catShopping:"ទិញឥវ៉ាន់", catTransport:"ធ្វើដំណើរ", catSavings:"សន្សំ", catOther:"ផ្សេងៗ", calculator:"ម៉ាស៊ីនគិតលេខ", calculatorHint:"គណនា ហើយយកទៅប្រើជាចំនួនទឹកប្រាក់។", useAmount:"ប្រើចំនួននេះ", khrWholeOnly:"KHR ប្រើតែចំនួនរៀលពេញ", quickTransport:"ធ្វើដំណើរ", showMore:"មើលបន្ថែម", showingRecords:"បង្ហាញ {shown} ក្នុងចំណោម {total}", newVersionAvailable:"មានកំណែថ្មី។ សូមបើកកម្មវិធីឡើងវិញ។"
+    editHint:"ចំនួនទឹកប្រាក់ក្នុងប្រវត្តិនឹងនៅដដែល លុះត្រាតែអ្នកកែប្រែកំណត់ត្រានេះ។", currency:"រូបិយប័ណ្ណ", saveChanges:"រក្សាទុកការកែប្រែ", recordUpdated:"បានកែប្រែកំណត់ត្រា", category:"ប្រភេទ", thisMonth:"ខែនេះ", monthlyHint:"សង្ខេបប្រចាំខែ", balance:"សមតុល្យ", topCategory:"ប្រភេទប្រើច្រើនបំផុត៖ {category}", monthlyBudgets:"ថវិកាប្រចាំខែ", monthlyBudgetsHint:"តាមដានកម្រិតចំណាយសម្រាប់ខែនេះ។", categoryChart:"បំបែកតាមប្រភេទ", categoryChartHint:"ចំណាយខែនេះតាមប្រភេទ។", noCategorySpending:"មិនទាន់មានចំណាយតាមប្រភេទសម្រាប់ខែនេះ។", categoryManager:"គ្រប់គ្រងប្រភេទ", categoryManagerHint:"បន្ថែម ប្តូរឈ្មោះ លុប ឬកំណត់ប្រភេទឡើងវិញ។", newCategoryPlaceholder:"ឈ្មោះប្រភេទថ្មី", addCategory:"បន្ថែម", save:"រក្សាទុក", remove:"លុប", resetCategories:"កំណត់លំនាំដើម", categoryExists:"ប្រភេទនេះមានរួចហើយ", categoryAdded:"បានបន្ថែមប្រភេទ", categoryRenamed:"បានប្តូរឈ្មោះប្រភេទ", categoryRemoved:"បានលុបប្រភេទ", categoriesReset:"បានកំណត់ប្រភេទឡើងវិញ", cannotRemoveOther:"មិនអាចលុប ផ្សេងៗ បានទេ", removeCategoryConfirm:"លុបប្រភេទនេះ? កំណត់ត្រាដែលមានស្រាប់នឹងផ្លាស់ទៅ ផ្សេងៗ។", resetCategoriesConfirm:"កំណត់ប្រភេទទៅលំនាំដើមវិញ? ប្រភេទផ្ទាល់ខ្លួននឹងផ្លាស់ទៅ ផ្សេងៗ។", categoryBudgets:"ថវិកាតាមប្រភេទ", categoryBudgetsHint:"កម្រិតប្រចាំខែតាមប្រភេទ។ រក្សាទុកជាប្រាក់ដុល្លារខាងក្នុង។", budgetCurrencyNote:"បង្ហាញជារូបិយប័ណ្ណបច្ចុប្បន្ន។", saveBudgets:"រក្សាទុកថវិកា", budgetsSaved:"បានរក្សាទុកថវិកា", noBudgetsSet:"មិនទាន់កំណត់ថវិកា។ បន្ថែមកម្រិតក្នុងការកំណត់។", budgetSpentLine:"{spent} នៃ {budget}", budgetInputHint:"ទុក 0 ប្រសិនបើគ្មានកម្រិត។", editHistory:"ប្រវត្តិកែប្រែ", noEdits:"មិនទាន់មានការកែប្រែ។", editedOn:"បានកែ {date}", editChangeLine:"{field}: {from} → {to}", fieldType:"ប្រភេទ", fieldAmount:"ចំនួនទឹកប្រាក់", fieldCategory:"ប្រភេទ", fieldDescription:"ការពិពណ៌នា", fieldDate:"កាលបរិច្ឆេទ", fieldNote:"ចំណាំ", selectedRecords:"បានជ្រើស {count}", selectedTotal:"សរុបដែលបានជ្រើស", clearSelection:"លុបជម្រើស", selectRecord:"ជ្រើសកំណត់ត្រា", selectHistory:"ជ្រើស", doneSelection:"រួចរាល់", selectAllVisible:"ជ្រើសដែលមើលឃើញ", quickAdd:"បញ្ចូលលឿន", quickAddHint:"បញ្ចូលរហ័សដោយប្រើជម្រើសស្អាតៗ។", quickAddAmount:"ចំនួនទឹកប្រាក់", saveQuickAdd:"រក្សាទុកលឿន", openFullAdd:"បើកទំព័របញ្ចូលពេញ", importPreview:"នាំចូល Backup?\n\nកំណត់ត្រា Backup: {count}\nបាននាំចេញ: {date}\nកំណែ: {version}\n\nវានឹងជំនួសកំណត់ត្រាបច្ចុប្បន្នក្នុង Browser នេះ។", backupReminderNewRecordsText:"អ្នកបានបញ្ចូលកំណត់ត្រា 10+ ចាប់តាំងពី Backup ចុងក្រោយ។ សូមនាំចេញ Backup ដើម្បីរក្សាកំណត់ត្រាឱ្យមានសុវត្ថិភាព។", none:"គ្មាន", quickAC:"AC", quickAC:"AC", quickFood:"អាហារ", quickCoffee:"កាហ្វេ", quickTransfer:"ផ្ទេរ", quickShopping:"ទិញឥវ៉ាន់", catFood:"អាហារ", catTransfer:"ផ្ទេរ", catShopping:"ទិញឥវ៉ាន់", catTransport:"ធ្វើដំណើរ", catSavings:"សន្សំ", catOther:"ផ្សេងៗ", calculator:"ម៉ាស៊ីនគិតលេខ", calculatorHint:"គណនា ហើយយកទៅប្រើជាចំនួនទឹកប្រាក់។", useAmount:"ប្រើចំនួននេះ", khrWholeOnly:"KHR ប្រើតែចំនួនរៀលពេញ", quickTransport:"ធ្វើដំណើរ", showMore:"មើលបន្ថែម", showingRecords:"បង្ហាញ {shown} ក្នុងចំណោម {total}", newVersionAvailable:"មានកំណែថ្មី។ សូមបើកកម្មវិធីឡើងវិញ។"
   }
 };
 
@@ -123,7 +124,9 @@ let previousPageIndex = 0;
 let balanceAnimationFrame = null;
 let calcState = { currency: "USD", current: "0", stored: null, operator: null, fresh: true };
 let selectedRecordIds = new Set();
+let selectionMode = false;
 let activeSwipeCard = null;
+let quickAddState = { description: "Food", category: "food" };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -272,6 +275,9 @@ function sanitizeSettings(input = {}) {
     const value = Number(rawBudgets[key] || 0);
     merged.categoryBudgets[key] = Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : 0;
   });
+
+  const backupRecordCount = Number(merged.lastBackupRecordCount || 0);
+  merged.lastBackupRecordCount = Number.isFinite(backupRecordCount) && backupRecordCount > 0 ? Math.floor(backupRecordCount) : 0;
 
   return merged;
 }
@@ -912,6 +918,11 @@ function pruneSelectedRecords() {
   selectedRecordIds = new Set([...selectedRecordIds].filter(id => existing.has(id)));
 }
 
+function selectionUIActive() {
+  pruneSelectedRecords();
+  return selectionMode || selectedRecordIds.size > 0;
+}
+
 function selectedHistoryRecords() {
   pruneSelectedRecords();
   return records.filter(record => selectedRecordIds.has(record.id));
@@ -924,17 +935,66 @@ function selectedHistoryNetUSD() {
   }, 0);
 }
 
-function clearSelectedRecords() {
+function resetHistorySelectionState() {
   selectedRecordIds.clear();
+  selectionMode = false;
+  closeOtherSwipeCards(null);
+}
+
+function clearSelectedRecords() {
+  resetHistorySelectionState();
   renderHistoryPage();
+}
+
+function enterSelectionMode(id = "") {
+  selectionMode = true;
+  closeOtherSwipeCards(null);
+  if (id) selectedRecordIds.add(id);
+  renderHistoryPage();
+  hapticTick([8, 24, 8]);
+}
+
+function toggleSelectionMode() {
+  if (selectionMode || selectedRecordIds.size) clearSelectedRecords();
+  else {
+    selectionMode = true;
+    closeOtherSwipeCards(null);
+    renderHistoryPage();
+    hapticTick(8);
+  }
 }
 
 function toggleRecordSelection(id) {
   if (!id) return;
+  closeOtherSwipeCards(null);
+  selectionMode = true;
   if (selectedRecordIds.has(id)) selectedRecordIds.delete(id);
   else selectedRecordIds.add(id);
+  if (!selectedRecordIds.size) selectionMode = true;
   renderHistoryPage();
   hapticTick(6);
+}
+
+function selectVisibleHistoryRecords() {
+  const visibleIds = filteredRecords().slice(0, historyVisibleCount).map(record => record.id);
+  if (!visibleIds.length) return;
+  closeOtherSwipeCards(null);
+  selectionMode = true;
+  selectedRecordIds = new Set(visibleIds);
+  renderHistoryPage();
+  closeHistoryFilter();
+  hapticTick([8, 20, 8]);
+}
+
+function renderSelectionControls() {
+  const button = $("#selectModeBtn");
+  if (button) {
+    button.textContent = selectionUIActive() ? tr("doneSelection") : tr("selectHistory");
+    button.classList.toggle("active", selectionUIActive());
+  }
+  const selectVisible = $("#selectVisibleBtn");
+  if (selectVisible) selectVisible.textContent = tr("selectAllVisible");
+  document.body.classList.toggle("history-selection-active", selectionUIActive() && activePageName() === "history");
 }
 
 function renderSelectionSummary() {
@@ -942,6 +1002,7 @@ function renderSelectionSummary() {
   if (!panel) return;
   const selected = selectedHistoryRecords();
   panel.classList.toggle("hidden", !selected.length || activePageName() !== "history");
+  renderSelectionControls();
   if (!selected.length) return;
 
   const countText = tr("selectedRecords", { count: selected.length });
@@ -1023,9 +1084,9 @@ function translateUI() {
   setText("totalInLabel", tr("totalIn")); setText("totalOutLabel", tr("totalOut")); setText("amountUsedLabel", tr("amountUsed"));
   setText("monthlyTitle", tr("thisMonth")); setText("monthlyHint", tr("monthlyHint")); setText("monthlyInLabel", tr("in")); setText("monthlyOutLabel", tr("out")); setText("monthlyBalanceLabel", tr("balance")); setText("monthlyBudgetsTitle", tr("monthlyBudgets")); setText("monthlyBudgetsHint", tr("monthlyBudgetsHint")); setText("categoryChartTitle", tr("categoryChart")); setText("categoryChartHint", tr("categoryChartHint"));
   setText("recentTitle", tr("recent")); setText("latestMovementText", tr("latestMovement")); setText("viewAllBtn", tr("viewAll"));
-  setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("floatingSaveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
+  setText("newTransactionTitle", tr("newTransaction")); setText("positiveOnlyText", tr("positiveOnly")); setText("openQuickAddBtn", tr("quickAdd")); setText("typeLabel", tr("type")); setText("outLabel", tr("out")); setText("inLabel", tr("in")); setText("amountLabel", tr("amount")); setText("categoryLabel", tr("category")); setText("whatForLabel", tr("whatFor")); setText("dateLabel", tr("date")); setText("noteLabel", tr("note")); setText("saveRecordBtn", tr("saveRecord")); setText("floatingSaveRecordBtn", tr("saveRecord")); setText("rememberTitle", tr("remember")); setText("rememberText", tr("rememberText"), true);
   $("#descriptionInput").placeholder = tr("whatForPlaceholder"); $("#noteInput").placeholder = tr("optionalNote");
-  setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("openFilterText", tr("filter")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("historyFilterTitle", tr("filterRecords")); setText("historyFilterHint", tr("filterHint")); setText("closeHistoryFilterBtn", tr("close")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("sortByLabel", tr("sortBy")); setText("clearFiltersBtn", tr("clearFilters")); setText("applyHistoryFilterBtn", tr("applyFilters"));
+  setText("allRecordsTitle", tr("allRecords")); setText("historyHintText", tr("historyHint")); setText("summaryBtn", tr("summary")); setText("selectModeBtn", selectionUIActive() ? tr("doneSelection") : tr("selectHistory")); setText("openFilterText", tr("filter")); setText("filterAll", tr("all")); setText("filterIn", tr("in")); setText("filterOut", tr("out")); setText("historyFilterTitle", tr("filterRecords")); setText("historyFilterHint", tr("filterHint")); setText("closeHistoryFilterBtn", tr("close")); setText("fromDateLabel", tr("fromDate")); setText("toDateLabel", tr("toDate")); setText("sortByLabel", tr("sortBy")); setText("clearFiltersBtn", tr("clearFilters")); setText("selectVisibleBtn", tr("selectAllVisible")); setText("applyHistoryFilterBtn", tr("applyFilters"));
   $("#searchInput").placeholder = tr("searchRecords");
   const sort = $("#sortSelect"); if (sort) { sort.options[0].text = tr("newest"); sort.options[1].text = tr("oldest"); sort.options[2].text = tr("highest"); sort.options[3].text = tr("lowest"); }
   setText("backupReminderTitle", tr("backupReminderTitle")); setText("backupReminderExportBtn", tr("exportBackup")); setText("backupReminderDismissBtn", tr("dismiss"));
@@ -1038,7 +1099,7 @@ function translateUI() {
   setText("editTypeLabel", tr("type")); setText("editOutLabel", tr("out")); setText("editInLabel", tr("in"));
   setText("editCurrencyLabel", tr("currency")); setText("editAmountLabel", tr("amount")); setText("editCategoryLabel", tr("category"));
   setText("editDescriptionLabel", tr("whatFor")); setText("editDateLabel", tr("date")); setText("editNoteLabel", tr("note")); setText("saveEditBtn", tr("saveChanges")); setText("editHistoryTitle", tr("editHistory"));
-  setText("calculatorTitle", tr("calculator")); setText("calculatorHint", tr("calculatorHint")); setText("useCalcAmountBtn", tr("useAmount"));
+  setText("calculatorTitle", tr("calculator")); setText("calculatorHint", tr("calculatorHint")); setText("useCalcAmountBtn", tr("useAmount")); setText("quickAddTitle", tr("quickAdd")); setText("quickAddHint", tr("quickAddHint")); setText("quickAddTypeLabel", tr("type")); setText("quickAddOutLabel", tr("out")); setText("quickAddInLabel", tr("in")); setText("quickAddAmountLabel", tr("quickAddAmount")); setText("saveQuickAddBtn", tr("saveQuickAdd")); setText("openFullAddFromQuickBtn", tr("openFullAdd")); setText("closeQuickAddBtn", tr("close"));
   setText("summaryTitle", tr("summaryTitle")); setText("summaryHint", tr("summaryHint")); setText("closeSummaryBtn", tr("close")); setText("summaryInLabel", tr("totalIn")); setText("summaryOutLabel", tr("totalOut")); setText("summaryBalanceLabel", tr("balanceLeft")); setText("summaryInGraphLabel", tr("totalIn")); setText("summaryOutGraphLabel", tr("totalOut"));
   setText("clearSelectionBtn", tr("clearSelection"));
 }
@@ -1118,6 +1179,7 @@ function renderRecordList(target, list, compact = false) {
     const recordMeta = `${category} • ${displayDate(record.date)} • ${escapeHTML(record.note || (record.type === "In" ? tr("in") : tr("out")))}${entryRate}`;
     const recordId = escapeHTML(record.id);
     const selected = selectedRecordIds.has(record.id);
+    const showSelector = selectionUIActive();
 
     if (compact) {
       return `
@@ -1134,13 +1196,13 @@ function renderRecordList(target, list, compact = false) {
     }
 
     return `
-      <article class="record-card ${selected ? "record-selected" : ""}" data-record-card-id="${recordId}">
-        <div class="record-swipe-actions" aria-hidden="${selected ? "true" : "false"}">
+      <article class="record-card ${selected ? "record-selected" : ""} ${showSelector ? "selection-mode" : ""}" data-record-card-id="${recordId}" aria-selected="${selected ? "true" : "false"}">
+        <div class="record-swipe-actions" aria-hidden="true">
           <button class="swipe-edit-btn" type="button" data-edit="${recordId}"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>${tr("edit")}</button>
           <button class="swipe-delete-btn" type="button" data-delete="${recordId}"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>${tr("delete")}</button>
         </div>
         <div class="record-card-body selectable-record-body">
-          <button class="record-select-btn ${selected ? "active" : ""}" type="button" data-select-record="${recordId}" aria-label="${tr("selectRecord")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4 4L19 7.5"/></svg></button>
+          <button class="record-select-btn ${selected ? "active" : ""}" type="button" data-select-record="${recordId}" aria-label="${tr("selectRecord")}" tabindex="${showSelector ? "0" : "-1"}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4 4L19 7.5"/></svg></button>
           <div>
             <h4>${escapeHTML(record.description || (record.type === "In" ? tr("addedFallback") : tr("usedFallback")))}</h4>
             <p>${recordMeta}</p>
@@ -1201,7 +1263,7 @@ function setupSwipeableRecordCard(card) {
   }
 
   function open() {
-    if (card.classList.contains("record-selected")) {
+    if (selectionUIActive() || card.classList.contains("record-selected")) {
       close({ immediate: true });
       return;
     }
@@ -1235,16 +1297,36 @@ function setupSwipeableRecordCard(card) {
   card._closeSwipe = close;
   card._openSwipe = open;
 
+  let longPressTimer = 0;
+  let longPressFired = false;
+
+  function clearLongPressTimer() {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = 0;
+    }
+  }
+
   body.addEventListener("pointerdown", event => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    if (card.classList.contains("record-selected")) return;
     if (event.target.closest("button, a, input, textarea, select")) return;
+    if (selectionUIActive()) return;
     dragging = true;
     axis = null;
+    longPressFired = false;
     startX = event.clientX;
     startY = event.clientY;
     startTime = performance.now();
     baseX = currentX;
+    const recordId = card.dataset.recordCardId || "";
+    clearLongPressTimer();
+    longPressTimer = setTimeout(() => {
+      longPressFired = true;
+      dragging = false;
+      axis = null;
+      close({ immediate: true });
+      if (recordId) enterSelectionMode(recordId);
+    }, 520);
     try { body.setPointerCapture(event.pointerId); } catch (e) {}
   });
 
@@ -1254,6 +1336,7 @@ function setupSwipeableRecordCard(card) {
     const dy = event.clientY - startY;
     if (axis === null) {
       if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) clearLongPressTimer();
       axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
       if (axis === "x") {
         closeOtherSwipeCards(card);
@@ -1267,6 +1350,7 @@ function setupSwipeableRecordCard(card) {
   });
 
   function endDrag(event) {
+    clearLongPressTimer();
     if (!dragging) return;
     dragging = false;
     if (axis !== "x") {
@@ -1283,12 +1367,18 @@ function setupSwipeableRecordCard(card) {
   }
 
   body.addEventListener("pointerup", endDrag);
-  body.addEventListener("pointercancel", () => close());
+  body.addEventListener("pointercancel", () => { clearLongPressTimer(); close(); });
   body.addEventListener("lostpointercapture", event => {
     if (dragging) endDrag(event);
   });
 
   body.addEventListener("click", event => {
+    if (longPressFired) {
+      event.preventDefault();
+      event.stopPropagation();
+      longPressFired = false;
+      return;
+    }
     if (opened) {
       event.preventDefault();
       event.stopPropagation();
@@ -1468,6 +1558,7 @@ function renderHistoryPage() {
   if (searchInput) searchInput.value = searchTerm;
 
   updateHistoryFilterButton();
+  renderSelectionControls();
   $$(".chip").forEach(button => button.classList.toggle("active", button.dataset.filter === activeFilter));
   renderHistoryList();
 }
@@ -1732,6 +1823,92 @@ function useCalculatorAmount() {
 }
 
 
+
+function quickAddPresets() {
+  return [
+    { description: "Food", category: "food", label: quickDescriptionLabel("Food") },
+    { description: "Coffee", category: "food", label: quickDescriptionLabel("Coffee") },
+    { description: "Transfer", category: "transfer", label: quickDescriptionLabel("Transfer") },
+    { description: "Transport", category: "transport", label: quickDescriptionLabel("Transport") },
+    { description: "Shopping", category: "shopping", label: quickDescriptionLabel("Shopping") },
+    { description: "AC", category: "transfer", label: quickDescriptionLabel("AC") }
+  ];
+}
+
+function renderQuickAddSheet() {
+  const container = $("#quickAddPresetList");
+  if (container) {
+    container.innerHTML = quickAddPresets().map(preset => `
+      <button class="quick-add-preset ${preset.description === quickAddState.description ? "active" : ""}" type="button" data-quick-add-desc="${escapeHTML(preset.description)}" data-quick-add-category="${escapeHTML(preset.category)}">${escapeHTML(preset.label)}</button>
+    `).join("");
+  }
+  const amount = $("#quickAddAmountInput");
+  const symbol = $("#quickAddCurrency");
+  const info = currencyInfo(settings.displayCurrency);
+  if (amount) {
+    amount.step = info.step;
+    amount.placeholder = info.placeholder;
+    amount.inputMode = settings.displayCurrency === "KHR" ? "numeric" : "decimal";
+  }
+  if (symbol) symbol.textContent = info.symbol;
+  updateSegmentedPills();
+}
+
+function openQuickAdd(type = "Out") {
+  quickAddState = { description: "Food", category: "food" };
+  const out = $("#quickAddTypeOut");
+  const input = type === "In" ? $("#quickAddTypeIn") : out;
+  if (input) input.checked = true;
+  if ($("#quickAddAmountInput")) $("#quickAddAmountInput").value = "";
+  renderQuickAddSheet();
+  $("#quickAddBackdrop")?.classList.add("show");
+  document.body.classList.add("modal-open");
+  setTimeout(() => $("#quickAddAmountInput")?.focus(), 180);
+}
+
+function closeQuickAdd() {
+  $("#quickAddBackdrop")?.classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+
+function saveQuickAddRecord(event) {
+  event.preventDefault();
+  let rawAmount = Number($("#quickAddAmountInput")?.value || 0);
+  if (settings.displayCurrency === "KHR") rawAmount = Math.round(rawAmount);
+  else rawAmount = Number(rawAmount.toFixed(2));
+  if (!rawAmount || rawAmount <= 0) {
+    showToast(tr("enterValidAmount"));
+    return;
+  }
+
+  const previousBalanceUSD = totals(records).balanceUSD;
+  const type = new FormData(event.currentTarget).get("quickAddType") === "In" ? "In" : "Out";
+  const amountUSD = displayToUsd(rawAmount, settings.displayCurrency);
+
+  records.push({
+    id: uid(),
+    type,
+    amountUSD: Math.round(amountUSD * 10000) / 10000,
+    originalAmount: rawAmount,
+    originalCurrency: settings.displayCurrency,
+    exchangeRateAtEntry: Number(settings.exchangeRate || 4000),
+    category: quickAddState.category || "other",
+    editHistory: [],
+    description: quickAddState.description || (type === "In" ? tr("addedFallback") : tr("usedFallback")),
+    date: todayISO(),
+    note: "",
+    createdAt: Date.now()
+  });
+
+  saveRecords();
+  saveState();
+  closeQuickAdd();
+  setPage("home", { render: false });
+  render({ animateBalanceFrom: previousBalanceUSD });
+  showToast(tr("recordSaved"));
+  hapticTick(12);
+}
+
 function daysSinceISO(iso) {
   if (!iso) return Infinity;
   const time = new Date(iso).getTime();
@@ -1739,11 +1916,16 @@ function daysSinceISO(iso) {
   return Math.floor((Date.now() - time) / 86400000);
 }
 
+function recordsSinceLastBackup() {
+  return Math.max(0, records.length - Number(settings.lastBackupRecordCount || 0));
+}
+
 function backupReminderDue() {
   if (!records.length) return false;
   const dismissedToday = settings.backupReminderDismissedAt === todayISO();
   if (dismissedToday) return false;
   if (!settings.lastBackupAt) return true;
+  if (recordsSinceLastBackup() >= 10) return true;
   return daysSinceISO(settings.lastBackupAt) >= 7;
 }
 
@@ -1753,7 +1935,7 @@ function renderBackupReminder() {
   const due = backupReminderDue();
   banner.classList.toggle("hidden", !due);
   if (!due) return;
-  const textKey = settings.lastBackupAt ? "backupReminderText" : "backupReminderNeverText";
+  const textKey = !settings.lastBackupAt ? "backupReminderNeverText" : (recordsSinceLastBackup() >= 10 ? "backupReminderNewRecordsText" : "backupReminderText");
   setText("backupReminderText", tr(textKey));
 }
 
@@ -1767,6 +1949,7 @@ function exportBackup() {
   const data = { app: "DollarTracker", version: APP_VERSION, exportedAt: new Date().toISOString(), settings, records };
   downloadFile(`dollartracker-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), "application/json");
   settings.lastBackupAt = new Date().toISOString();
+  settings.lastBackupRecordCount = records.length;
   settings.backupReminderDismissedAt = "";
   saveSettings();
   render();
@@ -1931,33 +2114,47 @@ function saveEditedRecord(event) {
 
 
 
+function backupPreviewText(data, normalizedRecords) {
+  const exportedAt = data?.exportedAt ? displayDateTime(data.exportedAt) : tr("never");
+  const version = data?.version || "Unknown";
+  return tr("importPreview", {
+    count: normalizedRecords.length,
+    date: exportedAt,
+    version
+  });
+}
+
 function importBackup(file) {
   if (!file) return;
   const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result);
-        if (!hasImportableRecordsContainer(data)) throw new Error("Invalid backup");
-        const importedRecords = extractRecordsFromValue(data);
-        if (!confirm(tr("importConfirm"))) return;
-  
-        if (data.settings) settings = sanitizeSettings({ ...settings, ...data.settings });
-        records = importedRecords.map(normalizeRecord).filter(Boolean);
-        selectedRecordIds.clear();
-        saveRecords();
-        saveSettings();
-        resetHistoryVisibleCount();
-        saveState();
-        setPage("home", { render: false });
-        render();
-        showToast(tr("backupImported"));
-      } catch {
-        alert(tr("importError"));
-      }
-    };
-    reader.readAsText(file);
-}
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!hasImportableRecordsContainer(data)) throw new Error("Invalid backup");
+      const importedRecords = extractRecordsFromValue(data);
+      const previewRecords = importedRecords.map(item => item && typeof item === "object" ? item : null).filter(Boolean);
+      if (!confirm(backupPreviewText(data, previewRecords))) return;
 
+      if (data.settings) settings = sanitizeSettings({ ...settings, ...data.settings });
+      records = importedRecords.map(normalizeRecord).filter(Boolean);
+      resetHistorySelectionState();
+      settings.lastBackupRecordCount = records.length;
+      saveRecords();
+      saveSettings();
+      resetHistoryVisibleCount();
+      saveState();
+      setPage("home", { render: false });
+      render();
+      showToast(tr("backupImported"));
+    } catch {
+      alert(tr("importError"));
+    } finally {
+      const input = $("#importBackupInput");
+      if (input) input.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
 
 function historyAdvancedFiltersActive() {
   return Boolean(fromDate || toDate || sortMode !== "newest");
@@ -1980,6 +2177,7 @@ function closeHistoryFilter() {
 }
 
 function applyHistoryFilter() {
+  resetHistorySelectionState();
   resetHistoryVisibleCount();
   saveState();
   render();
@@ -1987,6 +2185,7 @@ function applyHistoryFilter() {
 }
 
 function clearFilters() {
+  resetHistorySelectionState();
   activeFilter = "All";
   searchTerm = "";
   fromDate = "";
@@ -2028,6 +2227,7 @@ function finishClearEverything() {
   sortMode = "newest";
   clearArmedUntil = 0;
   selectedRecordIds.clear();
+  selectionMode = false;
 
   const keysToRemove = new Set([RECORD_KEY, STATE_KEY, ...LEGACY_RECORD_KEYS, "wifeyMoneyRecords.liquid.v1"]);
   for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -2105,7 +2305,31 @@ function initEvents() {
 
   window.addEventListener("scroll", () => closeOtherSwipeCards(null), { passive: true });
 
-  $$(".nav-item").forEach(item => item.addEventListener("click", () => { closeOtherSwipeCards(null); setPage(item.dataset.page); }));
+  const addNavItem = document.querySelector('.nav-item[data-page="add"]');
+  if (addNavItem) {
+    let quickAddTimer = 0;
+    const clearQuickAddTimer = () => { if (quickAddTimer) { clearTimeout(quickAddTimer); quickAddTimer = 0; } };
+    addNavItem.addEventListener("pointerdown", () => {
+      clearQuickAddTimer();
+      addNavItem._quickAddOpened = false;
+      quickAddTimer = setTimeout(() => {
+        addNavItem._quickAddOpened = true;
+        openQuickAdd("Out");
+        hapticTick([8, 22, 8]);
+      }, 520);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(name => addNavItem.addEventListener(name, clearQuickAddTimer));
+  }
+
+  $$(".nav-item").forEach(item => item.addEventListener("click", event => {
+    if (item._quickAddOpened) {
+      item._quickAddOpened = false;
+      event.preventDefault();
+      return;
+    }
+    resetHistorySelectionState();
+    setPage(item.dataset.page);
+  }));
 
   $$("[data-go]").forEach(button => button.addEventListener("click", () => {
     setPage(button.dataset.go);
@@ -2128,6 +2352,19 @@ function initEvents() {
   $("#languageToggle").addEventListener("click", switchLanguageSmooth);
 
   $("#transactionForm").addEventListener("submit", addRecord);
+  $("#openQuickAddBtn")?.addEventListener("click", () => openQuickAdd(document.querySelector('input[name="type"]:checked')?.value || "Out"));
+  $("#quickAddForm")?.addEventListener("submit", saveQuickAddRecord);
+  $("#closeQuickAddBtn")?.addEventListener("click", closeQuickAdd);
+  $("#openFullAddFromQuickBtn")?.addEventListener("click", () => { closeQuickAdd(); setPage("add"); });
+  $("#quickAddBackdrop")?.addEventListener("click", event => { if (event.target.id === "quickAddBackdrop") closeQuickAdd(); });
+  $("#quickAddPresetList")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-quick-add-desc]");
+    if (!button) return;
+    quickAddState = { description: button.dataset.quickAddDesc, category: button.dataset.quickAddCategory || "other" };
+    renderQuickAddSheet();
+    hapticTick(6);
+  });
+  $$('input[name="quickAddType"]').forEach(input => input.addEventListener("change", updateSegmentedPills));
 
   $("#historyList").addEventListener("click", event => {
     const showMoreButton = event.target.closest("[data-show-more-history]");
@@ -2143,6 +2380,14 @@ function initEvents() {
       event.stopPropagation();
       closeOtherSwipeCards(null);
       toggleRecordSelection(selectButton.dataset.selectRecord);
+      return;
+    }
+
+    const card = event.target.closest(".record-card[data-record-card-id]");
+    if (card && selectionUIActive() && !event.target.closest("button, a, input, textarea, select")) {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleRecordSelection(card.dataset.recordCardId);
       return;
     }
 
@@ -2162,6 +2407,7 @@ function initEvents() {
 
   $$(".chip").forEach(chip => chip.addEventListener("click", () => {
     activeFilter = chip.dataset.filter;
+    resetHistorySelectionState();
     resetHistoryVisibleCount();
     saveState();
     render();
@@ -2169,20 +2415,23 @@ function initEvents() {
 
   $("#searchInput").addEventListener("input", event => {
     searchTerm = event.target.value;
+    resetHistorySelectionState();
     debouncedHistorySearchRender();
   });
-  $("#fromDateInput").addEventListener("change", event => { fromDate = event.target.value; resetHistoryVisibleCount(); saveState(); render(); });
-  $("#toDateInput").addEventListener("change", event => { toDate = event.target.value; resetHistoryVisibleCount(); saveState(); render(); });
-  $("#sortSelect").addEventListener("change", event => { sortMode = event.target.value; resetHistoryVisibleCount(); saveState(); render(); });
+  $("#fromDateInput").addEventListener("change", event => { fromDate = event.target.value; resetHistorySelectionState(); resetHistoryVisibleCount(); saveState(); render(); });
+  $("#toDateInput").addEventListener("change", event => { toDate = event.target.value; resetHistorySelectionState(); resetHistoryVisibleCount(); saveState(); render(); });
+  $("#sortSelect").addEventListener("change", event => { sortMode = event.target.value; resetHistorySelectionState(); resetHistoryVisibleCount(); saveState(); render(); });
   $("#clearFiltersBtn").addEventListener("click", clearFilters);
   $("#openHistoryFilterBtn").addEventListener("click", openHistoryFilter);
   $("#closeHistoryFilterBtn").addEventListener("click", closeHistoryFilter);
+  $("#selectVisibleBtn")?.addEventListener("click", selectVisibleHistoryRecords);
   $("#applyHistoryFilterBtn").addEventListener("click", applyHistoryFilter);
   $("#historyFilterBackdrop").addEventListener("click", event => {
     if (event.target.id === "historyFilterBackdrop") closeHistoryFilter();
   });
 
   $("#summaryBtn").addEventListener("click", () => { renderSummary(); $("#summaryBackdrop").classList.add("show"); });
+  $("#selectModeBtn")?.addEventListener("click", toggleSelectionMode);
   $("#closeSummaryBtn").addEventListener("click", () => $("#summaryBackdrop").classList.remove("show"));
   $("#summaryBackdrop").addEventListener("click", event => { if (event.target.id === "summaryBackdrop") $("#summaryBackdrop").classList.remove("show"); });
   $("#clearSelectionBtn")?.addEventListener("click", clearSelectedRecords);

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800;900&family=Noto+Sans+Khmer:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.7.6" />
+  <link rel="stylesheet" href="styles.css?v=3.8.0" />
 </head>
 <body>
   <div class="aurora-bg" aria-hidden="true">
@@ -136,7 +136,7 @@
 
       <section class="page" id="page-add" data-title-key="addRecord">
         <section class="panel glass">
-          <div class="section-title"><h3 id="newTransactionTitle">New Transaction</h3><p class="hint" id="positiveOnlyText">Enter positive numbers only. Type decides in or out.</p></div>
+          <div class="section-title add-title-row"><div><h3 id="newTransactionTitle">New Transaction</h3><p class="hint" id="positiveOnlyText">Enter positive numbers only. Type decides in or out.</p></div><button class="ghost-button compact-button" type="button" id="openQuickAddBtn">Quick Add</button></div>
           <form id="transactionForm" class="form" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false">
             <label><span id="typeLabel">Type</span>
               <div class="segmented glass-lite">
@@ -181,7 +181,10 @@
         <section class="panel glass">
           <div class="panel-head">
             <div><h3 id="allRecordsTitle">All Records</h3><p class="hint" id="historyHintText">Search, filter, and review your records.</p></div>
-            <button class="ghost-button" type="button" id="summaryBtn">Summary</button>
+            <div class="history-head-actions">
+              <button class="ghost-button" type="button" id="selectModeBtn">Select</button>
+              <button class="ghost-button" type="button" id="summaryBtn">Summary</button>
+            </div>
           </div>
 
           <div class="history-tools history-tools-clean">
@@ -384,6 +387,7 @@
 
           <div class="filter-sheet-actions">
             <button class="secondary-button compact-button" type="button" id="clearFiltersBtn">Clear Filters</button>
+            <button class="secondary-button compact-button" type="button" id="selectVisibleBtn">Select visible</button>
             <button class="primary-button compact-button" type="button" id="applyHistoryFilterBtn">Apply Filters</button>
           </div>
         </div>
@@ -460,6 +464,40 @@
     </div>
 
 
+    <div class="quick-add-backdrop" id="quickAddBackdrop">
+      <section class="quick-add-sheet glass-strong" role="dialog" aria-modal="true" aria-labelledby="quickAddTitle">
+        <div class="panel-head">
+          <div>
+            <h3 id="quickAddTitle">Quick Add</h3>
+            <p class="hint" id="quickAddHint">Fast entry with clean presets.</p>
+          </div>
+          <button class="ghost-button" type="button" id="closeQuickAddBtn">Close</button>
+        </div>
+
+        <form id="quickAddForm" class="form" autocomplete="off">
+          <label>
+            <span id="quickAddTypeLabel">Type</span>
+            <div class="segmented glass-lite">
+              <input type="radio" name="quickAddType" id="quickAddTypeOut" value="Out" checked />
+              <label for="quickAddTypeOut" id="quickAddOutLabel">Out</label>
+              <input type="radio" name="quickAddType" id="quickAddTypeIn" value="In" />
+              <label for="quickAddTypeIn" id="quickAddInLabel">In</label>
+            </div>
+          </label>
+
+          <div class="quick-add-presets" id="quickAddPresetList"></div>
+
+          <label>
+            <span id="quickAddAmountLabel">Amount</span>
+            <div class="amount-wrap"><span id="quickAddCurrency">$</span><input id="quickAddAmountInput" type="number" inputmode="decimal" min="0" step="0.01" placeholder="8.60" required /></div>
+          </label>
+
+          <button class="primary-button full" type="submit" id="saveQuickAddBtn">Save Quick Add</button>
+          <button class="secondary-button full" type="button" id="openFullAddFromQuickBtn">Open full Add</button>
+        </form>
+      </section>
+    </div>
+
     <div class="calculator-backdrop" id="calculatorBackdrop">
       <section class="calculator-sheet glass-strong" role="dialog" aria-modal="true" aria-labelledby="calculatorTitle">
         <div class="panel-head">
@@ -506,6 +544,6 @@
 
     <div class="toast glass-strong" id="toast"></div>
   </div>
-  <script src="app.js?v=3.7.6"></script>
+  <script src="app.js?v=3.8.0"></script>
 </body>
 </html>

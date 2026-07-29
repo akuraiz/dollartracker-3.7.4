@@ -1297,3 +1297,59 @@ html[data-template=pearl] .theme-signature{
   html[data-template=ocean] .theme-signature{width:130px;height:89px;right:4px;top:9px}
   html[data-template=pearl] .theme-signature{width:120px;height:88px;right:5px;top:9px}
 }
+
+/* ---------------------------------------------------------------------------
+   23. v3.8.0 — refinement pack: intentional selection, quick add, iPhone polish
+--------------------------------------------------------------------------- */
+.history-head-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto}
+.history-head-actions .ghost-button{min-height:44px;padding:9px 13px}
+#selectModeBtn.active{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:var(--on-accent)}
+
+.add-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+.add-title-row>div{min-width:0}
+.add-title-row .ghost-button{white-space:nowrap;margin-top:2px}
+
+.record-card{contain:layout paint;transform:translateZ(0)}
+.record-card-body{min-height:76px}
+.selectable-record-body{grid-template-columns:minmax(0,1fr) auto auto}
+.record-select-btn{display:none;opacity:0;transform:scale(.88);pointer-events:none}
+.record-card.selection-mode .selectable-record-body{grid-template-columns:auto minmax(0,1fr) auto auto}
+.record-card.selection-mode .record-select-btn,
+.record-card.record-selected .record-select-btn{display:grid;opacity:1;transform:scale(1);pointer-events:auto}
+.record-card.selection-mode .record-more-btn{opacity:.34;pointer-events:none}
+body.history-selection-active .record-card:not(.record-selected) .record-card-body{box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+body.history-selection-active .record-card:not(.record-selected){opacity:.96}
+
+.filter-sheet-actions{grid-template-columns:1fr 1fr 1fr}
+
+.quick-add-backdrop{position:fixed;inset:0;display:none;visibility:hidden;opacity:0;pointer-events:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.40);padding:16px;padding-bottom:calc(16px + var(--safe-bottom));transition:opacity .2s ease;z-index:69}
+.quick-add-backdrop.show{display:flex;visibility:visible;opacity:1;pointer-events:auto}
+.quick-add-sheet{display:block;width:min(100%,448px);max-height:min(84svh,720px);overflow-y:auto;border-radius:30px;padding:18px;margin:0;animation:sheetIn .24s cubic-bezier(.22,1,.36,1) both}
+.quick-add-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.quick-add-preset{min-height:46px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.08);color:var(--text);font-size:12px;font-weight:900;padding:10px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quick-add-preset.active{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:var(--on-accent);border-color:transparent}
+#quickAddForm .secondary-button{min-height:50px}
+
+@media (hover:none) and (pointer:coarse), (max-width:520px){
+  .glass{backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%)}
+  .glass-strong{backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
+  .glass-lite{backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%)}
+  .quick-card{backdrop-filter:blur(22px) saturate(155%);-webkit-backdrop-filter:blur(22px) saturate(155%)}
+  .record-list{content-visibility:auto;contain-intrinsic-size:1px 460px}
+  .record-card-body{transition:transform .30s cubic-bezier(.22,1,.36,1),border-radius .18s ease,box-shadow .22s ease}
+  .history-head-actions{gap:6px}
+  .history-head-actions .ghost-button{padding:9px 11px;font-size:12px}
+}
+
+@media (max-width:370px){
+  .history-head-actions{width:100%;justify-content:flex-start;margin-top:2px}
+  .panel-head:has(.history-head-actions){flex-wrap:wrap}
+  .filter-sheet-actions{grid-template-columns:1fr}
+  .quick-add-presets{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .add-title-row{display:grid;grid-template-columns:1fr;gap:8px}
+  .add-title-row .ghost-button{width:max-content}
+  .record-card.selection-mode .selectable-record-body{grid-template-columns:auto minmax(0,1fr) auto}
+  .record-card.selection-mode .record-more-btn{display:none}
+}
+#quickAddTypeOut:checked+label{background:var(--danger);color:#fff}
+#quickAddTypeIn:checked+label{background:var(--positive);color:#fff}

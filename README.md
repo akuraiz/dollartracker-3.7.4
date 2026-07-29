@@ -1,3 +1,21 @@
+# DollarTracker v3.8.0 Refinement Pack
+
+Focus: iPhone smoothness, clearer History selection, Quick Add, and safer backup import without crowding the UI.
+
+## v3.8.0 changes
+
+- History selection is now intentional: tap **Select** or long-press a record to enter selection mode.
+- Selection circles stay hidden during normal browsing so History looks calmer.
+- Tapping cards selects them only while selection mode is active.
+- Added **Select visible** in the History filter sheet for the currently visible filtered records.
+- Changing search, filters, sorting, or navigation clears selection to avoid stale totals.
+- Added a small **Quick Add** sheet with practical presets and the current USD/KHR mode.
+- Add nav long-press opens Quick Add; the Add page also has a visible Quick Add button.
+- Backup import now previews record count, export date, and version before replacing current records.
+- Backup reminder also appears after 10+ new records since the last backup.
+- Reduced mobile glass blur pressure and added containment hints for smoother iPhone scrolling.
+- Kept recurring transactions out of this build to avoid adding a confusing management UI before the core flows are fully tested on phone.
+
 # DollarTracker Stable v3
 
 Local-only mobile ledger app.
