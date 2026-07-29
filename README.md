@@ -354,3 +354,13 @@ No storage schema change. No money logic changes beyond preserving historical KH
 - Disabled swipe dragging while a record is selected, keeping selection mode calm and preventing accidental Edit/Delete reveals.
 - Removed small-screen signature SVG scaling/drop-shadow filters so balance-card theme artwork renders sharper on iPhone.
 - Bumped app/script/style version and service-worker cache for cleaner PWA refresh.
+
+
+## v3.7.6 Signature SVG Sharpness Patch
+
+- Sharpened all signature Balance-card SVG assets for iPhone/Safari rendering.
+- Removed heavy internal SVG drop-shadow/blur filters from Web, Pink, Symbiote, Blush Pop, Ocean, and Pearl assets.
+- Reduced Frost Pine glow/shadow blur while keeping the warm lights visible.
+- Locked mobile signature sizing to intrinsic SVG aspect ratios instead of stretched background sizing.
+- Kept money logic, storage, History selection, swipe behavior, backup, and calculator logic untouched.
+- Bumped app/script/style version and service-worker cache for a clean PWA refresh.

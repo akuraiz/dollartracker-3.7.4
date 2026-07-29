@@ -988,7 +988,7 @@ html[data-template=web][data-theme=light]{
 
 
 /* ---------------------------------------------------------------------------
-   20. v3.7.5 — smoother swipe reset + selected history total
+   20. v3.7.6 — smoother swipe reset + selected history total
 --------------------------------------------------------------------------- */
 .selectable-record-body{
   grid-template-columns:auto minmax(0,1fr) auto auto;
@@ -1108,7 +1108,7 @@ html[data-template=christmas] .theme-signature{
 }
 
 /* ---------------------------------------------------------------------------
-   21. v3.7.5 — phone polish: bottom actions, cleaner swipe, crisper signatures
+   21. v3.7.6 — phone polish: bottom actions, cleaner swipe, crisper signatures
 --------------------------------------------------------------------------- */
 .floating-save-button{
   position:fixed;
@@ -1256,4 +1256,44 @@ body.floating-save-ready #saveRecordBtn{
     width:min(428px,calc(100vw - 20px));
   }
   .selection-float strong{font-size:22px}
+}
+
+
+/* ---------------------------------------------------------------------------
+   22. v3.7.6 — sharp signature SVGs on iPhone/Safari
+   Keep signature assets as crisp vector artwork: no CSS blur/drop-shadow on the
+   phone path, no stretched background rasterization, and intrinsic-ratio sizes.
+--------------------------------------------------------------------------- */
+html[data-template=pink] .theme-signature,
+html[data-template=christmas] .theme-signature,
+html[data-template=web] .theme-signature,
+html[data-template=symbiote] .theme-signature,
+html[data-template=blush] .theme-signature,
+html[data-template=ocean] .theme-signature,
+html[data-template=pearl] .theme-signature{
+  background-size:contain!important;
+  background-repeat:no-repeat!important;
+  background-position:top right!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  transform:translate3d(0,0,0)!important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+@media (hover:none) and (pointer:coarse), (max-width:520px){
+  .theme-signature{
+    image-rendering:auto;
+    filter:none!important;
+    -webkit-filter:none!important;
+    transform:translate3d(0,0,0)!important;
+    opacity:.99!important;
+  }
+  html[data-template=pink] .theme-signature{width:136px;height:88px;right:2px;top:8px}
+  html[data-template=christmas] .theme-signature{width:154px;height:84px;right:-2px;top:6px}
+  html[data-template=web] .theme-signature{width:150px;height:110px;right:0;top:4px}
+  html[data-template=symbiote] .theme-signature{width:132px;height:97px;right:2px;top:8px}
+  html[data-template=blush] .theme-signature{width:122px;height:89px;right:4px;top:9px}
+  html[data-template=ocean] .theme-signature{width:130px;height:89px;right:4px;top:9px}
+  html[data-template=pearl] .theme-signature{width:120px;height:88px;right:5px;top:9px}
 }
